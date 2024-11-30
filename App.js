@@ -13,6 +13,8 @@ import PontosTuristicosScreen from './PontosTuristicosScreen';
 import DetalhesScreen from './DetalhesScreen';
 import AgendaScreen from './AgendaScreen'; // Importe a tela de agenda
 import ProfileScreen from './PerfilScreen'; // Importe a tela de perfil
+import MainScreen from './MainScreen';
+import UserDetails from './UserDetails';
 
 const Stack = createStackNavigator();
 
@@ -52,6 +54,8 @@ export default function App() {
         <Stack.Screen name="Detalhes" component={DetalhesScreen} options={{ title: 'Detalhes do Ponto Turístico' }} />
         <Stack.Screen name="Agenda" component={AgendaScreen} options={{ title: 'Agenda Semanal' }} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
+        <Stack.Screen name="MainScreen" component={MainScreen} />
+        <Stack.Screen name="UserDetails" component={UserDetails} />
       </Stack.Navigator>
     </NavigationContainer>
   );
