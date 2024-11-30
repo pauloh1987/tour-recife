@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import {
   View,
   Text,
@@ -191,9 +191,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 100, // Limite o tamanho da imagem
+    height: 100, // Limite o tamanho da imagem
     borderRadius: 10,
+    marginRight: 15, // Espaço entre a imagem e o texto
   },
   textContainer: {
     padding: 10,
