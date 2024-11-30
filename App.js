@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ActivityIndicator, View } from 'react-native';
-import auth from '@react-native-firebase/auth'; // Importe o Firebase Auth
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { auth } from './firebaseConfig';
+; // Importe o Auth do Firebase modular
 
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
@@ -18,22 +19,28 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Monitorar o estado de autenticação
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged((user) => {
-      setUser(user);
-      setLoading(false); // Pare o indicador de carregamento
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      console.log("Estado do usuário:", currentUser); // Adicionei um log aqui para monitorar o estado
+      setUser(currentUser ? currentUser : null); // Se o usuário não estiver logado, seta como null
+      setLoading(false); // Para o carregamento
     });
+
+    // Cleanup para evitar vazamentos de memória
     return () => unsubscribe();
   }, []);
 
   if (loading) {
-    // Mostra um indicador de carregamento enquanto verifica o estado do usuário
+    // Enquanto o estado de autenticação está sendo verificado
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
   }
+
+  console.log("Usuário está logado?", user); // Monitorando o estado do usuário
 
   return (
     <NavigationContainer>
@@ -49,3 +56,11 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
