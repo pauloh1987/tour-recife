@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { auth } from './firebaseConfig'; // Importa o Firebase Auth
+import { auth } from './firebaseConfig'; // Importe o Firebase Auth
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const db = getFirestore(); // Instancia o Firestore
@@ -21,14 +21,12 @@ export default function PerfilScreen() {
         } catch (error) {
           console.error("Erro ao buscar dados do usuário:", error);
         }
-      } else {
-        // Redirecionar para login ou exibir mensagem
       }
     };
-  
+
     fetchVisitedPlaces();
   }, []);
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil do Usuário</Text>
@@ -82,4 +80,3 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
 });
-

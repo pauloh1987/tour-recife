@@ -12,18 +12,18 @@ import {
   TouchableWithoutFeedback, 
   Keyboard 
 } from 'react-native';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; // Importar Firebase Auth
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // Variável para armazenar mensagens de erro
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
-    const auth = getAuth(); // Inicializa a autenticação do Firebase
+    const auth = getAuth();
     try {
-      await signInWithEmailAndPassword(auth, email, password); // Tenta fazer login
-      navigation.replace('Home'); // Navega para a tela 'Home' se o login for bem-sucedido
+      await signInWithEmailAndPassword(auth, email, password);
+      navigation.replace('Home');
     } catch (error) {
       switch (error.code) {
         case 'auth/invalid-email':
@@ -32,10 +32,12 @@ export default function LoginScreen({ navigation }) {
         case 'auth/user-not-found':
           setErrorMessage('Usuário não encontrado!');
           break;
+        case 'auth/wrong-password':
+          setErrorMessage('Senha incorreta!');
+          break;
         default:
-          setErrorMessage('Erro ao fazer login!');
+          setErrorMessage('Erro ao fazer login! Verifique seus dados.');
       }
-      
     }
   };
 
@@ -44,7 +46,10 @@ export default function LoginScreen({ navigation }) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled" // Garante que os toques nos campos de texto funcionem corretamente
+      >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.innerContainer}>
             <Image 
@@ -54,8 +59,9 @@ export default function LoginScreen({ navigation }) {
 
             <Text style={styles.title}>Bem-vindo de volta!</Text>
 
-            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null} {/* Exibe mensagem de erro, se houver */}
+            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
+            {/* Campo de email */}
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -63,7 +69,13 @@ export default function LoginScreen({ navigation }) {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={true} // Certifique-se de que o campo é editável
+              accessibilityLabel="Campo de entrada para email"
             />
+
+            {/* Campo de senha */}
             <TextInput
               style={styles.input}
               placeholder="Senha"
@@ -71,13 +83,19 @@ export default function LoginScreen({ navigation }) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              autoCapitalize="none"
+              editable={true} // Certifique-se de que o campo é editável
+              accessibilityLabel="Campo de entrada para senha"
             />
 
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
+            <TouchableOpacity 
+              style={styles.registerButton} 
+              onPress={() => navigation.navigate('Register')}
+            >
               <Text style={styles.registerText}>Não tem uma conta? Registre-se</Text>
             </TouchableOpacity>
           </View>
@@ -155,5 +173,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-

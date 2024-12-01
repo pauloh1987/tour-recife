@@ -1,12 +1,12 @@
-import React from 'react'; 
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image
-        source={require('./assets/logo.png')}  // Logo do Tour Recife (com fundo transparente)
-        style={styles.logo}  // Aplica o estilo para logo
+        source={require('./assets/logo.png')} // Logo do Tour Recife (com fundo transparente)
+        style={styles.logo} // Aplica o estilo para logo
       />
 
       <Text style={styles.title}>Bem-vindo ao Tour Recife!</Text>
@@ -26,8 +26,11 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.buttonText}>Agenda Semanal</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => console.log('Outra funcionalidade')}>
-        <Text style={styles.buttonText}>Outra Funcionalidade</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Perfil')} // Navegação para a tela de perfil
+      >
+        <Text style={styles.buttonText}>Meu Perfil</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => console.log('Mais opções')}>

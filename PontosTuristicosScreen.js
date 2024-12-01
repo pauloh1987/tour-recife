@@ -76,7 +76,7 @@ export default function PontosTuristicosScreen({ navigation }) {
         style={styles.filterButton}
         onPress={() => setIsModalVisible(true)}
       >
-        <Text style={styles.filterButtonText}>Filtrar</Text>
+        <Text style={styles.filterButtonText}>Filtrar Locais</Text>
       </TouchableOpacity>
 
       {/* Modal do Filtro */}
@@ -88,7 +88,7 @@ export default function PontosTuristicosScreen({ navigation }) {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Escolha uma categoria</Text>
+            <Text style={styles.modalTitle}>Escolha uma Categoria</Text>
             {['Praia', 'Museu', 'Parques', 'Histórico', 'Shoppings'].map((category) => (
               <TouchableOpacity
                 key={category}
@@ -137,21 +137,26 @@ export default function PontosTuristicosScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f4f4f4',
     paddingTop: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
   },
   filterButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 10,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 25,
     marginBottom: 20,
     alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 5,
   },
   filterButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   modalContainer: {
@@ -163,49 +168,60 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    width: '80%',
+    borderRadius: 15,
+    width: '85%',
+    alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
   },
   modalOption: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+    width: '100%',
+    alignItems: 'center',
   },
   modalOptionText: {
     fontSize: 16,
+    color: '#333',
   },
   modalOptionClear: {
     borderBottomWidth: 0,
   },
   card: {
     flexDirection: 'row',
+    backgroundColor: '#fff',
     marginBottom: 15,
-    backgroundColor: '#f9f9f9',
     borderRadius: 10,
     overflow: 'hidden',
-    elevation: 3,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
   image: {
-    width: 100, // Limite o tamanho da imagem
-    height: 100, // Limite o tamanho da imagem
-    borderRadius: 10,
-    marginRight: 15, // Espaço entre a imagem e o texto
+    width: 100,
+    height: 100,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
   },
   textContainer: {
-    padding: 10,
+    flex: 1,
+    padding: 15,
     justifyContent: 'center',
   },
   name: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#333',
   },
   description: {
     fontSize: 14,
-    color: '#555',
+    color: '#666',
   },
 });
