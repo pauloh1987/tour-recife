@@ -12,7 +12,7 @@ import IntroScreen from './IntroScreen';
 import PontosTuristicosScreen from './PontosTuristicosScreen';
 import DetalhesScreen from './DetalhesScreen';
 import AgendaScreen from './AgendaScreen';
-import ProfileScreen from './PerfilScreen';
+import PerfilScreen from './PerfilScreen';
 import MainScreen from './MainScreen';
 
 const Stack = createStackNavigator();
@@ -21,7 +21,6 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Verifica o estado de autenticação
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
@@ -41,8 +40,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={user ? "Home" : "Login"}>
-        {/* Rotas principais */}
+      <Stack.Navigator initialRouteName={user ? 'Home' : 'Login'}>
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registrar-se' }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Tela Inicial' }} />
@@ -50,7 +48,7 @@ export default function App() {
         <Stack.Screen name="PontosTuristicos" component={PontosTuristicosScreen} options={{ title: 'Pontos Turísticos' }} />
         <Stack.Screen name="Detalhes" component={DetalhesScreen} options={{ title: 'Detalhes do Ponto Turístico' }} />
         <Stack.Screen name="Agenda" component={AgendaScreen} options={{ title: 'Agenda Semanal' }} />
-        <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
+        <Stack.Screen name="Perfil" component={PerfilScreen} options={{ title: 'Perfil do Usuário' }} />
         <Stack.Screen name="MainScreen" component={MainScreen} options={{ title: 'Tela Principal' }} />
       </Stack.Navigator>
     </NavigationContainer>

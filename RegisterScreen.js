@@ -12,10 +12,13 @@ import {
   TouchableWithoutFeedback, 
   Keyboard 
 } from 'react-native';
-import { auth } from './firebaseConfig'; // Importe a configuração do Firebase
+import { auth, db } from './firebaseConfig'; // Importe a configuração do Firebase
 import { createUserWithEmailAndPassword } from 'firebase/auth'; // Método para criar usuário
+import { setDoc, doc } from 'firebase/firestore'; // Para salvar dados no Firestore
 
 export default function RegisterScreen({ navigation }) {
+  const [fullName, setFullName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,11 +29,31 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
+    if (!fullName || !birthDate) {
+      alert('Por favor, preencha todos os campos!');
+      return;
+    }
+
+    // Validação do formato da data de nascimento
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(birthDate)) {
+      alert('Por favor, insira a data de nascimento no formato DD/MM/AAAA.');
+      return;
+    }
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password); // Usando o Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Salvar dados adicionais no Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        fullName,
+        birthDate,
+        email
+      });
+
       navigation.replace('Home'); // Navega para a tela 'Home' após sucesso
     } catch (error) {
-      alert('Erro ao registrar: ' + error.message); // Exibe erro caso falhe
+      alert('Erro ao registrar: ' + error.message);
     }
   };
 
@@ -47,6 +70,37 @@ export default function RegisterScreen({ navigation }) {
               style={styles.logo} 
             />
             <Text style={styles.title}>Crie sua conta</Text>
+
+            {/* Campo de Nome Completo */}
+            <TextInput
+              style={styles.input}
+              placeholder="Nome Completo"
+              placeholderTextColor="#000"
+              value={fullName}
+              onChangeText={setFullName}
+            />
+
+            {/* Campo de Data de Nascimento */}
+            <TextInput
+              style={styles.input}
+              placeholder="Data de Nascimento (DD/MM/AAAA)"
+              placeholderTextColor="#000"
+              value={birthDate}
+              onChangeText={(text) => {
+                const rawText = text.replace(/[^0-9]/g, '');
+
+                let formattedText = rawText;
+                if (rawText.length > 2 && rawText.length <= 4) {
+                  formattedText = `${rawText.slice(0, 2)}/${rawText.slice(2)}`;
+                } else if (rawText.length > 4) {
+                  formattedText = `${rawText.slice(0, 2)}/${rawText.slice(2, 4)}/${rawText.slice(4, 8)}`;
+                }
+
+                setBirthDate(formattedText);
+              }}
+              keyboardType="numeric"
+              maxLength={10}
+            />
 
             {/* Campo de Email */}
             <TextInput

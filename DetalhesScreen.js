@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, FlatList, Linking } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  FlatList,
+  Linking,
+} from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { db } from './firebaseConfig';
-import { collection, addDoc, query, where, onSnapshot } from 'firebase/firestore';
+import { db, auth } from './firebaseConfig';
+import { collection, addDoc, query, where, onSnapshot, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function DetalhesScreen() {
   const route = useRoute();
@@ -10,6 +22,7 @@ export default function DetalhesScreen() {
 
   const [isFeedbackModalVisible, setIsFeedbackModalVisible] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const [rating, setRating] = useState(0);
   const [feedbacks, setFeedbacks] = useState([]);
 
   const touristSpots = [
@@ -96,7 +109,6 @@ export default function DetalhesScreen() {
 
   useEffect(() => {
     const feedbackQuery = query(collection(db, 'feedbacks'), where('spotId', '==', spotId));
-
     const unsubscribe = onSnapshot(feedbackQuery, (snapshot) => {
       const loadedFeedbacks = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -111,13 +123,28 @@ export default function DetalhesScreen() {
   const handleSendFeedback = async () => {
     if (feedback.trim()) {
       try {
-        await addDoc(collection(db, 'feedbacks'), {
-          spotId,
-          text: feedback,
-          timestamp: new Date(),
-        });
-        setFeedback('');
-        setIsFeedbackModalVisible(false);
+        const user = auth.currentUser;
+        if (user) {
+          const userRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userRef);
+          const userName = userDoc.exists() ? userDoc.data().fullName || 'Usuário' : 'Usuário';
+
+          await addDoc(collection(db, 'feedbacks'), {
+            spotId,
+            text: feedback,
+            rating,
+            timestamp: new Date(),
+            userName,
+          });
+
+          await updateDoc(userRef, {
+            visitedPlaces: arrayUnion(spot.name),
+          });
+
+          setFeedback('');
+          setRating(0);
+          setIsFeedbackModalVisible(false);
+        }
       } catch (error) {
         console.error('Erro ao enviar feedback:', error);
       }
@@ -146,11 +173,6 @@ export default function DetalhesScreen() {
         <Text style={styles.address}>{spot.address}</Text>
         <Text style={styles.category}>Categoria: {spot.category}</Text>
 
-        <View style={styles.moreInfoContainer}>
-          <Text style={styles.moreInfoTitle}>Mais Informações:</Text>
-          <Text style={styles.moreInfoText}>{spot.moreInfo}</Text>
-        </View>
-
         <TouchableOpacity style={styles.mapButton} onPress={openMaps}>
           <Text style={styles.mapButtonText}>Como Chegar</Text>
         </TouchableOpacity>
@@ -169,6 +191,8 @@ export default function DetalhesScreen() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <View style={styles.feedbackItem}>
+                  <Text style={styles.feedbackUserName}>{item.userName || 'Anônimo'}</Text>
+                  <Text style={styles.feedbackRating}>Avaliação: {item.rating || 'Não avaliado'} ★</Text>
                   <Text style={styles.feedbackText}>{item.text}</Text>
                 </View>
               )}
@@ -193,14 +217,25 @@ export default function DetalhesScreen() {
               onChangeText={setFeedback}
               multiline
             />
+            <View style={styles.ratingContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                  <MaterialIcons
+                    name="star"
+                    size={40}
+                    color={star <= rating ? '#FFD700' : '#ccc'}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
             <TouchableOpacity style={styles.sendButton} onPress={handleSendFeedback}>
               <Text style={styles.sendButtonText}>Enviar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.sendButton, { backgroundColor: 'gray', marginTop: 10 }]}
+              style={[styles.cancelButton]}
               onPress={() => setIsFeedbackModalVisible(false)}
             >
-              <Text style={styles.sendButtonText}>Cancelar</Text>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -215,7 +250,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f4f4f4',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -224,63 +259,44 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 250,
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   detailsContainer: {
-    marginTop: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
-    elevation: 2,
+    marginBottom: 20,
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
     marginBottom: 10,
+    textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'justify',
     marginBottom: 10,
+    textAlign: 'justify',
   },
   address: {
     fontSize: 14,
-    color: '#444',
-    textAlign: 'center',
     marginBottom: 5,
+    textAlign: 'center',
   },
   category: {
     fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
+    color: '#666',
     marginBottom: 15,
-  },
-  moreInfoContainer: {
-    marginTop: 10,
-    backgroundColor: '#f4f4f4',
-    padding: 10,
-    borderRadius: 10,
-  },
-  moreInfoTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  moreInfoText: {
-    fontSize: 16,
-    color: '#444',
-    textAlign: 'justify',
+    textAlign: 'center',
   },
   mapButton: {
     backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 20,
-    marginTop: 20,
+    padding: 15,
+    borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 10,
   },
   mapButtonText: {
     color: '#fff',
@@ -289,10 +305,10 @@ const styles = StyleSheet.create({
   },
   feedbackButton: {
     backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 20,
-    marginTop: 20,
+    padding: 15,
+    borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 20,
   },
   feedbackButtonText: {
     color: '#fff',
@@ -307,15 +323,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  noFeedbacksText: {
-    fontSize: 14,
-    color: '#666',
-  },
   feedbackItem: {
     backgroundColor: '#f4f4f4',
+    borderRadius: 8,
     padding: 10,
-    borderRadius: 10,
     marginBottom: 10,
+  },
+  feedbackUserName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#007bff',
+  },
+  feedbackRating: {
+    fontSize: 14,
+    color: '#FFD700',
   },
   feedbackText: {
     fontSize: 14,
@@ -329,9 +350,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
+    borderRadius: 10,
     padding: 20,
-    borderRadius: 15,
-    width: '85%',
+    width: '90%',
     alignItems: 'center',
   },
   modalTitle: {
@@ -342,21 +363,38 @@ const styles = StyleSheet.create({
   feedbackInput: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 10,
-    padding: 10,
+    borderRadius: 8,
     width: '100%',
-    minHeight: 100,
+    padding: 10,
+    marginBottom: 20,
     textAlignVertical: 'top',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     marginBottom: 20,
   },
   sendButton: {
     backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 20,
+    padding: 15,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+    padding: 15,
+    borderRadius: 8,
     width: '100%',
     alignItems: 'center',
   },
-  sendButtonText: {
+  cancelButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
