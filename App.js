@@ -12,7 +12,7 @@ import IntroScreen from './IntroScreen';
 import PontosTuristicosScreen from './PontosTuristicosScreen';
 import DetalhesScreen from './DetalhesScreen';
 import AgendaScreen from './AgendaScreen';
-import ProfileScreen from './PerfilScreen';
+import PerfilScreen from './PerfilScreen'; // Corrigi o nome para "PerfilScreen"
 import MainScreen from './MainScreen';
 
 const Stack = createStackNavigator();
@@ -43,15 +43,51 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName={user ? "Home" : "Login"}>
         {/* Rotas principais */}
-        <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
-        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registrar-se' }} />
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Tela Inicial' }} />
-        <Stack.Screen name="Intro" component={IntroScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="PontosTuristicos" component={PontosTuristicosScreen} options={{ title: 'Pontos Turísticos' }} />
-        <Stack.Screen name="Detalhes" component={DetalhesScreen} options={{ title: 'Detalhes do Ponto Turístico' }} />
-        <Stack.Screen name="Agenda" component={AgendaScreen} options={{ title: 'Agenda Semanal' }} />
-        <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
-        <Stack.Screen name="MainScreen" component={MainScreen} options={{ title: 'Tela Principal' }} />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{ title: 'Login', headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen} 
+          options={{ title: 'Registrar-se' }} 
+        />
+        <Stack.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{ title: 'Tela Inicial' }} 
+        />
+        <Stack.Screen 
+          name="Intro" 
+          component={IntroScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="PontosTuristicos" 
+          component={PontosTuristicosScreen} 
+          options={{ title: 'Pontos Turísticos' }} 
+        />
+        <Stack.Screen 
+          name="Detalhes" 
+          component={DetalhesScreen} 
+          options={{ title: 'Detalhes do Ponto Turístico' }} 
+        />
+        <Stack.Screen 
+          name="Agenda" 
+          component={AgendaScreen} 
+          options={{ title: 'Agenda Semanal' }} 
+        />
+        <Stack.Screen 
+          name="Perfil" 
+          component={PerfilScreen} 
+          options={{ title: 'Meu Perfil' }} 
+        />
+        <Stack.Screen 
+          name="MainScreen" 
+          component={MainScreen} 
+          options={{ title: 'Tela Principal' }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
