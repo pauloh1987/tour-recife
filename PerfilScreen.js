@@ -12,18 +12,23 @@ export default function PerfilScreen() {
     const fetchVisitedPlaces = async () => {
       const user = auth.currentUser;
       if (user) {
-        const userRef = doc(db, 'users', user.uid); // Documento do usuário no Firestore
-        const userDoc = await getDoc(userRef); // Pega os dados do usuário
-
-        if (userDoc.exists()) {
-          setVisitedPlaces(userDoc.data().visitedPlaces || []);
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            setVisitedPlaces(userDoc.data().visitedPlaces || []);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar dados do usuário:", error);
         }
+      } else {
+        // Redirecionar para login ou exibir mensagem
       }
     };
-
+  
     fetchVisitedPlaces();
   }, []);
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil do Usuário</Text>
@@ -77,3 +82,4 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
 });
+

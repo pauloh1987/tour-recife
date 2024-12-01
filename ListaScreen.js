@@ -10,7 +10,7 @@ const ListaScreen = ({ navigation }) => {
             renderItem={({ item }) => (
                 <TouchableOpacity
                     style={styles.itemContainer}
-                    onPress={() => navigation.navigate('DetalhesScreen', { id: item.id })}
+                    onPress={() => navigation.navigate('DetalhesScreen', { spotId: item.id })}
                 >
                     <Text style={styles.itemText}>{item.nome}</Text>
                 </TouchableOpacity>

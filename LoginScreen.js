@@ -25,7 +25,17 @@ export default function LoginScreen({ navigation }) {
       await signInWithEmailAndPassword(auth, email, password); // Tenta fazer login
       navigation.replace('Home'); // Navega para a tela 'Home' se o login for bem-sucedido
     } catch (error) {
-      setErrorMessage(error.message); // Exibe mensagem de erro se o login falhar
+      switch (error.code) {
+        case 'auth/invalid-email':
+          setErrorMessage('Email inválido!');
+          break;
+        case 'auth/user-not-found':
+          setErrorMessage('Usuário não encontrado!');
+          break;
+        default:
+          setErrorMessage('Erro ao fazer login!');
+      }
+      
     }
   };
 
@@ -145,3 +155,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+
