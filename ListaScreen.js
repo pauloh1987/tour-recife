@@ -31,3 +31,16 @@ const styles = StyleSheet.create({
 });
 
 export default ListaScreen;
+
+useEffect(() => {
+  const fetchPoints = async () => {
+    const routeId = route.params.routeId;
+    const routeDoc = doc(db, 'suggestedRoutes', routeId);
+    const routeData = await getDoc(routeDoc);
+    if (routeData.exists()) {
+      setPoints(routeData.data().points || []);
+    }
+  };
+
+  fetchPoints();
+}, []);

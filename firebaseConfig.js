@@ -1,28 +1,27 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, setDoc, updateDoc, collection, getDocs, arrayUnion } from 'firebase/firestore'; 
-
+import { getFirestore, doc, setDoc, updateDoc, collection, getDocs, arrayUnion } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Certifique-se de incluir isso
 
 const firebaseConfig = {
   apiKey: "AIzaSyBnl_z9y4bVsaH6V7EDHIQxUGC--A8Qn_M",
   authDomain: "tour-recife.firebaseapp.com",
   projectId: "tour-recife",
-  storageBucket: "tour-recife.firebasestorage.app", // Corrigido
+  storageBucket: "tour-recife.appspot.com", // Correção do erro no bucket
   messagingSenderId: "130813320192",
   appId: "1:130813320192:web:0e4f7717556cc58a5a8ce5",
-  measurementId: "G-ZNWTFCDD9N"
+  measurementId: "G-ZNWTFCDD9N",
 };
 
-// Inicialização do Firebase para Web
+// Inicialização do Firebase
 const app = initializeApp(firebaseConfig);
-
-console.log('Firebase App Initialized:', app);  // Verifica se o Firebase foi inicializado corretamente
-
+console.log('Firebase App Initialized:', app); 
 
 const auth = getAuth(app);
-const db = getFirestore(app); // Firestore, se necessário
+const db = getFirestore(app);
+const storage = getStorage(app); // Inicializando o storage
 
-export { auth, db };
+export { auth, db, storage };
 
 // Função para criar o perfil de usuário
 export const createUserProfile = async (userId, name) => {
@@ -45,5 +44,20 @@ export const addVisitedPlace = async (userId, place) => {
   }
 };
 
-// Função para buscar todos os usuários
-// export const fetchUsers = async 
+// Função para upload da imagem de perfil
+export const uploadProfileImage = async (userId, fileUri) => {
+  try {
+    const response = await fetch(fileUri); // Converte URI para Blob
+    const blob = await response.blob();
+
+    const storageRef = ref(storage, `profileImages/${userId}`);
+    await uploadBytes(storageRef, blob);
+
+    const downloadURL = await getDownloadURL(storageRef);
+    console.log('Imagem enviada com sucesso:', downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error('Erro ao fazer upload da imagem:', error);
+    throw new Error('Erro ao enviar a imagem. Tente novamente.');
+  }
+};

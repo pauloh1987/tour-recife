@@ -30,6 +30,13 @@ export default function HomeScreen({ navigation }) {
       >
         <Text style={styles.buttonText}>Meu Perfil</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Roteiros')} // Navegar para roteiros sugeridos
+      >
+        <Text style={styles.buttonText}>Roteiros Sugeridos</Text>
+      </TouchableOpacity>
     </View>
   );
 }

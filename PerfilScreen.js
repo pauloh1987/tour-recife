@@ -12,7 +12,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { auth, db, storage } from './firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function PerfilScreen() {
   const [fullName, setFullName] = useState('');
@@ -22,6 +22,7 @@ export default function PerfilScreen() {
   const [isEditing, setIsEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  // Função para buscar os dados do usuário
   useEffect(() => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
@@ -45,6 +46,7 @@ export default function PerfilScreen() {
     fetchUserData();
   }, []);
 
+  // Função para selecionar imagem
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -60,37 +62,46 @@ export default function PerfilScreen() {
     });
 
     if (!result.canceled) {
-      uploadImage(result.uri);
+      try {
+        const downloadURL = await uploadImage(result.uri);
+        setProfileImage(downloadURL);
+
+        const user = auth.currentUser;
+        if (user) {
+          const userRef = doc(db, 'users', user.uid);
+          await setDoc(userRef, { profileImage: downloadURL }, { merge: true });
+        }
+        alert('Foto de perfil atualizada com sucesso!');
+      } catch (error) {
+        console.error('Erro ao enviar a imagem:', error);
+        alert('Erro ao atualizar a foto de perfil. Tente novamente.');
+      }
     }
   };
 
-  const uploadImage = async (uri) => {
+  // Função para fazer o upload da imagem no Firebase Storage
+  const uploadImage = async (fileUri) => {
     setUploading(true);
-    const user = auth.currentUser;
-    if (!user) return;
-
     try {
-      const response = await fetch(uri);
+      const response = await fetch(fileUri);
       const blob = await response.blob();
 
+      const user = auth.currentUser;
       const storageRef = ref(storage, `profileImages/${user.uid}`);
-      await uploadBytes(storageRef, blob);
+      const snapshot = await uploadBytes(storageRef, blob);
 
-      const downloadURL = await getDownloadURL(storageRef);
-      setProfileImage(downloadURL);
-
-      const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, { profileImage: downloadURL }, { merge: true });
-
-      alert('Foto de perfil atualizada com sucesso!');
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      console.log('Upload bem-sucedido. URL da imagem:', downloadURL);
+      return downloadURL;
     } catch (error) {
-      console.error('Erro ao enviar a imagem:', error);
-      alert('Erro ao enviar a imagem. Tente novamente.');
+      console.error('Erro no upload da imagem:', error);
+      throw new Error('Erro ao enviar a imagem. Tente novamente.');
     } finally {
       setUploading(false);
     }
   };
 
+  // Função para salvar as alterações do perfil
   const handleSave = async () => {
     const user = auth.currentUser;
     if (user) {
