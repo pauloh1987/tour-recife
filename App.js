@@ -105,12 +105,12 @@ export default function App() {
           component={MainScreen} 
           options={{ title: 'Tela Principal' }} 
         />
-        <Stack.Screen
+        {/* Rota para Roteiros Sugeridos */}
+        <Stack.Screen 
           name="Roteiros"
           component={RoteirosScreen}
-           options={{ title: 'Roteiros Sugeridos' }}
-/>
-
+          options={{ title: 'Roteiros Sugeridos' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
